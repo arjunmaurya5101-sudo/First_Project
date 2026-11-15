@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hari Mandi – Online Grocery Store</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#14301f;--leaf:#2f8f4e;--leaf-d:#226b3a;--sun:#f2b705;--paper:#fbfdf9;--line:#dfe9dc;--chip:#eef5ec;--red:#d9383a;--mute:#5b6f61}
+*{box-sizing:border-box;margin:0}
+body{font-family:Nunito,system-ui,sans-serif;background:var(--paper);color:var(--ink);line-height:1.5}
+h1,h2,h3,.logo{font-family:'Baloo 2',system-ui,sans-serif;line-height:1.1}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+header{position:sticky;top:0;z-index:20;background:var(--ink);color:#fff;display:flex;gap:12px;align-items:center;padding:10px 16px}
+.logo{font-size:1.5rem;font-weight:800;white-space:nowrap}.logo span{color:var(--sun)}
+.search{flex:1;min-width:0;border:0;border-radius:999px;padding:10px 16px;background:#fff}
+.cartbtn{background:var(--sun);color:var(--ink);border:0;border-radius:999px;padding:10px 16px;font-weight:700;white-space:nowrap}
+.hero{padding:28px 16px 8px;max-width:1100px;margin:auto}
+.hero h1{font-size:clamp(2rem,6vw,3.4rem);font-weight:800}
+.hero p{color:var(--mute);margin-top:8px;max-width:52ch}
+.hero b{background:var(--sun);padding:0 6px;border-radius:4px;color:var(--ink)}
+.bar{max-width:1100px;margin:16px auto 0;padding:0 16px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.chip{border:1px solid var(--line);background:var(--chip);border-radius:999px;padding:6px 14px;font-weight:600}
+.chip[aria-pressed=true]{background:var(--leaf);border-color:var(--leaf);color:#fff}
+.bar select{margin-left:auto;border:1px solid var(--line);border-radius:8px;padding:6px 8px;background:#fff}
+.grid{max-width:1100px;margin:16px auto 60px;padding:0 16px;display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px}
+.card{border:1px solid var(--line);background:#fff;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:4px}
+.emoji{font-size:3.2rem;text-align:center;background:var(--chip);border-radius:10px;padding:8px 0}
+.card h3{font-size:1.1rem;font-weight:600;margin-top:6px}
+.unit{color:var(--mute);font-size:.85rem}
+.price{font-weight:700;font-size:1.1rem;margin-top:auto}
+.price s{color:var(--mute);font-weight:400;font-size:.85rem;margin-left:4px}
+.tag{color:var(--red);font-size:.8rem;font-weight:700}
+.add{border:2px solid var(--leaf);background:#fff;color:var(--leaf-d);border-radius:8px;padding:7px;font-weight:700;margin-top:6px}
+.add:hover{background:var(--leaf);color:#fff}
+.qty{display:flex;align-items:center;justify-content:space-between;margin-top:6px;background:var(--leaf);color:#fff;border-radius:8px}
+.qty button{background:none;border:0;color:#fff;font-size:1.3rem;width:40px;height:36px}
+.empty{grid-column:1/-1;text-align:center;color:var(--mute);padding:40px 0}
+.scrim{position:fixed;inset:0;background:rgba(10,25,15,.5);z-index:30;display:none}
+.scrim.on{display:block}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(420px,100%);background:#fff;z-index:40;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s}
+.drawer.on{transform:none}
+.dh{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line)}
+.dh h2{font-size:1.5rem}
+.x{background:none;border:0;font-size:1.6rem}
+.items{flex:1;overflow:auto;padding:8px 16px}
+.row{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.row .e{font-size:1.8rem}.row .n{flex:1}.row .n small{display:block;color:var(--mute)}
+.row .qty{margin:0;background:var(--chip);color:var(--ink)}.row .qty button{color:var(--ink);width:32px}
+.foot{padding:14px 16px;border-top:1px solid var(--line);background:var(--chip)}
+.line{display:flex;justify-content:space-between;margin:3px 0}
+.line.t{font-weight:800;font-size:1.2rem;margin-top:8px}
+.coupon{display:flex;gap:6px;margin:8px 0}
+.coupon input{flex:1;min-width:0;border:1px solid var(--line);border-radius:8px;padding:8px}
+.coupon button{border:0;background:var(--ink);color:#fff;border-radius:8px;padding:0 14px}
+.msg{font-size:.85rem;min-height:1.2em}.msg.ok{color:var(--leaf-d)}.msg.bad{color:var(--red)}
+.primary{width:100%;border:0;background:var(--leaf);color:#fff;border-radius:10px;padding:12px;font-weight:700;font-size:1.05rem;margin-top:8px}
+.primary:disabled{background:#a9bfae;cursor:not-allowed}
+.modal{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;padding:12px}
+.modal.on{display:flex}
+.box{background:#fff;border-radius:16px;padding:20px;width:min(460px,100%);max-height:94vh;overflow:auto}
+.box h2{font-size:1.6rem;margin-bottom:10px}
+label{display:block;font-weight:600;margin-top:10px}
+.box input,.box textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:9px;margin-top:3px}
+.err{color:var(--red);font-size:.85rem}
+.pay label{font-weight:400;display:flex;gap:8px;align-items:center;margin-top:6px}
+.pay input{width:auto;margin:0}
+.done{text-align:center}.done .big{font-size:3.5rem}
+.bar-ship{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin:6px 0}
+.bar-ship i{display:block;height:100%;background:var(--sun);transition:width .3s}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:9px 18px;border-radius:999px;z-index:60;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.on{opacity:1}
+footer{text-align:center;color:var(--mute);padding:20px;font-size:.9rem;border-top:1px solid var(--line)}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+@media(max-width:480px){.logo{font-size:1.2rem}.cartbtn{padding:10px 12px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Hari<span>Mandi</span></div>
+  <input class="search" id="q" type="search" placeholder="Search atta, doodh, sabzi…" aria-label="Search products">
+  <button class="cartbtn" id="openCart">🛒 Cart (<span id="cnt">0</span>)</button>
+</header>
+
+<section class="hero">
+  <h1>Taaza sabzi, ration aur doodh. <b>Ghar tak.</b></h1>
+  <p>Free delivery on orders above ₹499. Use code <strong>FRESH10</strong> for 10% off.</p>
+</section>
+
+<div class="bar" id="cats" role="group" aria-label="Categories"></div>
+<div class="bar"><select id="sort" aria-label="Sort products">
+  <option value="def">Sort: Featured</option><option value="pa">Price: low to high</option>
+  <option value="pd">Price: high to low</option><option value="az">Name: A to Z</option>
+</select></div>
+<main class="grid" id="grid"></main>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-label="Shopping cart">
+  <div class="dh"><h2>Your cart</h2><button class="x" id="closeCart" aria-label="Close cart">×</button></div>
+  <div class="items" id="items"></div>
+  <div class="foot" id="foot"></div>
+</aside>
+
+<div class="modal" id="modal"><div class="box" id="box"></div></div>
+<div class="toast" id="toast"></div>
+<footer>© Hari Mandi · Made with ♥ in Punjab</footer>
+
+<script>
+const P=[
+["Tomato","Veg","🍅","1 kg",40,48],["Onion","Veg","🧅","1 kg",35,0],["Potato","Veg","🥔","1 kg",30,0],
+["Carrot","Veg","🥕","500 g",30,36],["Spinach (Palak)","Veg","🥬","250 g",20,0],["Cauliflower","Veg","🥦","1 pc",45,0],
+["Green Chilli","Veg","🌶️","100 g",15,0],["Banana","Fruit","🍌","1 dozen",60,70],["Apple","Fruit","🍎","1 kg",180,210],
+["Mango","Fruit","🥭","1 kg",120,0],["Grapes","Fruit","🍇","500 g",90,0],["Orange (Kinnow)","Fruit","🍊","1 kg",80,0],
+["Full Cream Milk","Dairy","🥛","1 L",66,0],["Paneer","Dairy","🧀","200 g",85,0],["Desi Ghee","Dairy","🧈","500 ml",340,380],
+["Dahi (Curd)","Dairy","🥣","400 g",40,0],["Eggs","Dairy","🥚","12 pcs",84,0],["Wheat Atta","Staples","🌾","5 kg",235,260],
+["Basmati Rice","Staples","🍚","5 kg",520,580],["Toor Dal","Staples","🫘","1 kg",165,0],["Sugar","Staples","🧂","1 kg",48,0],
+["Mustard Oil","Staples","🛢️","1 L",180,195],["Tea (Chai Patti)","Staples","🍵","500 g",230,0],["Biscuits","Snacks","🍪","Family pack",30,0],
+["Namkeen Mix","Snacks","🥨","400 g",95,110],["Potato Chips","Snacks","🥔","150 g",40,0],["Mango Juice","Drinks","🧃","1 L",99,0],
+["Cold Drink","Drinks","🥤","2 L",95,0]
+].map((a,i)=>({id:i,name:a[0],cat:a[1],e:a[2],unit:a[3],price:a[4],mrp:a[5]}));
+const CATS=["All","Veg","Fruit","Dairy","Staples","Snacks","Drinks"];
+const CAT_LABEL={All:"All",Veg:"Sabzi",Fruit:"Fruits",Dairy:"Dairy & eggs",Staples:"Ration",Snacks:"Snacks",Drinks:"Drinks"};
+const FREE_AT=499,FEE=40,COUPON="FRESH10";
+const $=s=>document.querySelector(s);
+const inr=n=>"₹"+(Math.round(n*100)/100).toLocaleString("en-IN");
+let cart={},cat="All",coupon=false;
+try{cart=JSON.parse(localStorage.getItem("hm_cart")||"{}");coupon=localStorage.getItem("hm_coupon")==="1"}catch(e){}
+const save=()=>{try{localStorage.setItem("hm_cart",JSON.stringify(cart));localStorage.setItem("hm_coupon",coupon?"1":"0")}catch(e){}};
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+function toast(t){const e=$("#toast");e.textContent=t;e.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove("on"),1600)}
+function change(id,d){const n=(cart[id]||0)+d;if(n<=0)delete cart[id];else cart[id]=Math.min(n,20);save();render()}
+
+function totals(){
+  let sub=0;for(const id in cart)sub+=P[id].price*cart[id];
+  const disc=coupon?Math.round(sub*0.1*100)/100:0;
+  const after=sub-disc;const ship=sub===0||after>=FREE_AT?0:FEE;
+  return{sub,disc,ship,total:after+ship,after};
+}
+function qtyCtl(id){return `<div class="qty"><button data-d="-1" data-id="${id}" aria-label="Remove one">−</button><span>${cart[id]}</span><button data-d="1" data-id="${id}" aria-label="Add one">+</button></div>`}
+
+function renderGrid(){
+  const q=$("#q").value.trim().toLowerCase(),s=$("#sort").value;
+  let L=P.filter(p=>(cat==="All"||p.cat===cat)&&(!q||p.name.toLowerCase().includes(q)||CAT_LABEL[p.cat].toLowerCase().includes(q)));
+  if(s==="pa")L.sort((a,b)=>a.price-b.price);if(s==="pd")L.sort((a,b)=>b.price-a.price);if(s==="az")L.sort((a,b)=>a.name.localeCompare(b.name));
+  $("#grid").innerHTML=L.length?L.map(p=>`<article class="card"><div class="emoji" aria-hidden="true">${p.e}</div><h3>${p.name}</h3><div class="unit">${p.unit}</div>${p.mrp?`<div class="tag">${Math.round((1-p.price/p.mrp)*100)}% off</div>`:""}<div class="price">${inr(p.price)}${p.mrp?`<s>${inr(p.mrp)}</s>`:""}</div>${cart[p.id]?qtyCtl(p.id):`<button class="add" data-add="${p.id}">Add to cart</button>`}</article>`).join(""):`<p class="empty">No products match "${esc(q)}". Try another word or category.</p>`;
+}
+function renderCart(){
+  const ids=Object.keys(cart),t=totals();
+  $("#cnt").textContent=ids.reduce((a,i)=>a+cart[i],0);
+  $("#items").innerHTML=ids.length?ids.map(id=>{const p=P[id];return `<div class="row"><span class="e">${p.e}</span><div class="n">${p.name}<small>${p.unit} · ${inr(p.price)}</small></div>${qtyCtl(id)}<strong>${inr(p.price*cart[id])}</strong></div>`}).join(""):`<p class="empty">Your cart is empty. Add something fresh.</p>`;
+  const left=Math.max(0,FREE_AT-t.after);
+  $("#foot").innerHTML=ids.length?`<div>${left>0?`Add ${inr(left)} more for free delivery`:"You get free delivery 🎉"}</div><div class="bar-ship"><i style="width:${Math.min(100,t.after/FREE_AT*100)}%"></i></div>
+  <div class="coupon"><input id="cp" placeholder="Coupon code" aria-label="Coupon code" value="${coupon?COUPON:""}"><button id="applyCp">${coupon?"Remove":"Apply"}</button></div><div class="msg" id="cpm"></div>
+  <div class="line"><span>Subtotal</span><span>${inr(t.sub)}</span></div>${t.disc?`<div class="line"><span>Discount (10%)</span><span>−${inr(t.disc)}</span></div>`:""}
+  <div class="line"><span>Delivery</span><span>${t.ship?inr(t.ship):"Free"}</span></div><div class="line t"><span>Total</span><span>${inr(t.total)}</span></div>
+  <button class="primary" id="checkout">Checkout</button>`:"";
+}
+function render(){renderGrid();renderCart()}
+
+// events
+document.addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b)return;
+  if(b.dataset.add){change(+b.dataset.add,1);toast(P[b.dataset.add].name+" added")}
+  else if(b.dataset.d){change(+b.dataset.id,+b.dataset.d)}
+  else if(b.dataset.cat){cat=b.dataset.cat;drawCats();renderGrid()}
+  else if(b.id==="applyCp"){
+    if(coupon){coupon=false}else if($("#cp").value.trim().toUpperCase()===COUPON){coupon=true}
+    else{$("#cpm").textContent="Invalid code. Try FRESH10.";$("#cpm").className="msg bad";return}
+    save();renderCart();if(coupon){$("#cpm").textContent="FRESH10 applied: 10% off";$("#cpm").className="msg ok"}
+  }
+  else if(b.id==="checkout")checkout();
+});
+function drawCats(){$("#cats").innerHTML=CATS.map(c=>`<button class="chip" data-cat="${c}" aria-pressed="${c===cat}">${CAT_LABEL[c]}</button>`).join("")}
+function cartOpen(o){$("#drawer").classList.toggle("on",o);$("#scrim").classList.toggle("on",o)}
+$("#openCart").onclick=()=>cartOpen(true);$("#closeCart").onclick=()=>cartOpen(false);$("#scrim").onclick=()=>cartOpen(false);
+$("#q").oninput=renderGrid;$("#sort").onchange=renderGrid;
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){cartOpen(false);closeModal()}});
+
+// checkout
+function openModal(h){$("#box").innerHTML=h;$("#modal").classList.add("on")}
+function closeModal(){$("#modal").classList.remove("on")}
+$("#modal").addEventListener("click",e=>{if(e.target.id==="modal")closeModal()});
+function checkout(){
+  const t=totals();cartOpen(false);
+  openModal(`<h2>Delivery details</h2><form id="f" novalidate>
+  <label>Full name<input name="name" autocomplete="name"></label><div class="err" data-e="name"></div>
+  <label>Mobile number<input name="phone" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="10-digit number"></label><div class="err" data-e="phone"></div>
+  <label>Full address<textarea name="addr" rows="3" autocomplete="street-address"></textarea></label><div class="err" data-e="addr"></div>
+  <label>Pincode<input name="pin" inputmode="numeric" maxlength="6" autocomplete="postal-code"></label><div class="err" data-e="pin"></div>
+  <div class="pay"><label><input type="radio" name="pay" value="Cash on delivery" checked>Cash on delivery</label><label><input type="radio" name="pay" value="UPI on delivery">UPI on delivery</label></div>
+  <button class="primary" type="submit">Place order · ${inr(t.total)}</button>
+  <button class="primary" type="button" id="cancel" style="background:#fff;color:var(--ink);border:1px solid var(--line)">Back</button></form>`);
+  $("#cancel").onclick=()=>{closeModal();cartOpen(true)};
+  $("#f").onsubmit=ev=>{
+    ev.preventDefault();const f=Object.fromEntries(new FormData(ev.target));let bad=false;
+    const chk={name:f.name.trim().length>=2?"":"Enter your name.",phone:/^[6-9]\d{9}$/.test(f.phone)?"":"Enter a valid 10-digit mobile number.",addr:f.addr.trim().length>=8?"":"Enter your full address.",pin:/^\d{6}$/.test(f.pin)?"":"Enter a 6-digit pincode."};
+    for(const k in chk){document.querySelector(`[data-e=${k}]`).textContent=chk[k];if(chk[k])bad=true}
+    if(bad)return;
+    const t2=totals(),id="HM"+Date.now().toString().slice(-7);
+    const order={id,date:new Date().toISOString(),customer:f,items:Object.keys(cart).map(i=>({name:P[i].name,qty:cart[i],price:P[i].price})),total:t2.total};
+    try{const o=JSON.parse(localStorage.getItem("hm_orders")||"[]");o.push(order);localStorage.setItem("hm_orders",JSON.stringify(o))}catch(e){}
+    cart={};coupon=false;save();render();
+    openModal(`<div class="done"><div class="big">✅</div><h2>Order placed!</h2><p>Order ID <strong>${id}</strong></p><p>Total ${inr(t2.total)} · ${esc(f.pay)}</p><p class="unit">We will call ${esc(f.phone)} to confirm delivery.</p><button class="primary" id="ok">Keep shopping</button></div>`);
+    $("#ok").onclick=closeModal;
+  };
+}
+drawCats();render();
+</script>
+</body>
+</html>
